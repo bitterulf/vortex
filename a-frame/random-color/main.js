@@ -3,6 +3,13 @@ AFRAME.registerComponent('random-color', {
         interval: {type: 'int', default: 1000}
     },
     init: function () {
+        this.randomColor = function() {
+            return {
+                r: Math.random(),
+                g: Math.random(),
+                b: Math.random()
+            }
+        };
         this.counter = 0;
     },
     tick: function (time, timeDelta) {
@@ -13,10 +20,7 @@ AFRAME.registerComponent('random-color', {
 
             var el = this.el;
             var mesh = el.getObject3D('mesh');
-            var color = mesh.material.color;
-            color.r = Math.random();
-            color.g = Math.random();
-            color.b = Math.random();
+            mesh.material.color = this.randomColor();
         }
     }
 });

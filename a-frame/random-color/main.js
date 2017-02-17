@@ -34,6 +34,6 @@ AFRAME.registerComponent('random-color', {
 
         var el = this.el;
         var mesh = el.getObject3D('mesh');
-        mesh.material.color = this.interpolateColor(this.startColor, this.destinationColor, this.counter / 1000);
+        mesh.material.color = this.interpolateColor(this.startColor, this.destinationColor, this.counter / this.data.interval);
     }
 });

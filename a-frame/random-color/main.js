@@ -22,14 +22,20 @@ AFRAME.registerComponent('random-color', {
         this.counter = 0;
         this.startColor = this.randomColor();
         this.destinationColor = this.randomColor();
+
+        var switchColorHandler = function() {
+            this.startColor = this.destinationColor;
+            this.destinationColor = this.randomColor();
+        };
+
+        this.el.addEventListener('switchColor', switchColorHandler.bind(this));
     },
     tick: function (time, timeDelta) {
         this.counter += timeDelta;
 
         if (this.counter > this.data.interval) {
             this.counter = 0;
-            this.startColor = this.destinationColor;
-            this.destinationColor = this.randomColor();
+            this.el.dispatchEvent(new Event('switchColor'));
         }
 
         var el = this.el;

@@ -43,3 +43,25 @@ AFRAME.registerComponent('random-color', {
         mesh.material.color = this.interpolateColor(this.startColor, this.destinationColor, this.counter / this.data.interval);
     }
 });
+
+window.onload = function() {
+    console.log(document.querySelectorAll('[random-color]'));
+
+    var entity = document.querySelector('a-entity#foo');
+
+    entity.addEventListener('stateadded', function (evt) {
+        if (evt.detail.state === 'selected') {
+            console.log('Entity now selected!');
+        }
+    });
+
+    entity.addEventListener('startEngine', function (evt) {
+        console.log('engine starting');
+    });
+
+    entity.addState('selected');
+    entity.emit('startEngine');
+    console.log(entity.is('selected'));
+
+    entity.setAttribute('description', 'i am just an example');
+};

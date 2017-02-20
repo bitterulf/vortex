@@ -1,12 +1,41 @@
-var jwt = require('jsonwebtoken');
-var token = jwt.sign({ foo: 'bar' }, 'shhhhh', { expiresIn: '1s' });
+'use strict';
 
-console.log(jwt.verify(token, 'shhhhh'));
+const Hapi = require('hapi');
+const jwt = require('jsonwebtoken');
+const unirest = require('unirest');
+const auth = require('basic-auth');
 
-setTimeout(function() {
-    try {
-        jwt.verify(token, 'shhhhh');
-    } catch (err) {
-        console.log(err);
+const server = new Hapi.Server({});
+
+const secret = 'i am so secret';
+
+server.connection({
+  labels: ['api'],
+  port: 4000
+});
+
+server.route({
+    method: 'POST',
+    path: '/generate',
+    handler: function (request, reply) {
+		const user = auth(request);
+		console.log(user.name, user.pass);
+		reply(jwt.sign(request.payload, secret, { expiresIn: '1m' }));
     }
-}, 5000);
+});
+
+server.start((err) => {
+    if (err) {
+        throw err;
+    }
+
+    console.log('server start');
+});
+
+unirest.post('http://localhost:4000/generate')
+	.headers({'Accept': 'application/json', 'Content-Type': 'application/json'})
+	.auth('server', 'password', true)
+	.send({ "parameter": 23, "foo": "bar" })
+	.end(function (response) {
+		console.log(jwt.verify(response.body, secret));
+	});

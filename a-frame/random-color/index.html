@@ -7,9 +7,19 @@
         <script src="main.js"></script>
 
         <a-scene>
+			<a-camera
+			  	fps-look-controls
+				position="0 1.764 0">
+				<a-entity cursor="fuse: false; fuseTimeout: 500"
+						position="0 0 -1"
+						geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03;"
+						material="color: black; shader: flat">
+				</a-entity>
+			</a-camera>
+
             <a-entity id="foo"></a-entity>
             <a-sphere random-color="interval: 5000" position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-            <a-box random-color="interval: 5000" position="-1 0.5 -3" rotation="0 45 0" width="1" height="1" depth="1" color="#4CC3D9"></a-box>
+            <a-box cursor-listener random-color="interval: 5000" position="-1 0.5 -3" rotation="0 45 0" width="1" height="1" depth="1" color="#4CC3D9"></a-box>
             <a-cylinder random-color="interval: 5000" position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
             <a-plane random-color="interval: 5000" position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
             <a-sky color="#ECECEC"></a-sky>

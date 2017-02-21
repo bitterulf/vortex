@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const Hapi = require('hapi');
 const jwt = require('jsonwebtoken');
 const unirest = require('unirest');
@@ -7,10 +8,10 @@ const auth = require('basic-auth');
 
 const server = new Hapi.Server({});
 
-const secret = 'i am so secret';
+var privateKey = fs.readFileSync('key'); // pair.private;
+var publicKey = fs.readFileSync('key.pub'); // pair.public;
 
 server.connection({
-  labels: ['api'],
   port: 4000
 });
 
@@ -20,7 +21,15 @@ server.route({
     handler: function (request, reply) {
 		const user = auth(request);
 		console.log(user.name, user.pass);
-		reply(jwt.sign(request.payload, secret, { expiresIn: '1m' }));
+		reply(jwt.sign(request.payload, privateKey, {algorithm: 'RS256', expiresIn: '1m'}));
+    }
+});
+
+server.route({
+    method: 'GET',
+    path: '/publicKey',
+    handler: function (request, reply) {
+		reply(publicKey);
     }
 });
 
@@ -37,5 +46,9 @@ unirest.post('http://localhost:4000/generate')
 	.auth('server', 'password', true)
 	.send({ "parameter": 23, "foo": "bar" })
 	.end(function (response) {
-		console.log(jwt.verify(response.body, secret));
+        const token = response.body;
+        unirest.get('http://localhost:4000/publicKey')
+            .end(function (response) {
+                console.log(jwt.verify(token, response.body));
+            });
 	});

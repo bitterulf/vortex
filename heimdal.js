@@ -8,8 +8,11 @@ const auth = require('basic-auth');
 
 const server = new Hapi.Server({});
 
-var privateKey = fs.readFileSync('key'); // pair.private;
-var publicKey = fs.readFileSync('key.pub'); // pair.public;
+var NodeRSA = require('node-rsa');
+var key = new NodeRSA({b: 512});
+
+var privateKey = key.exportKey('pkcs1-sha256-private-pem');
+var publicKey = key.exportKey('pkcs1-sha256-public-pem');
 
 server.connection({
   port: 4000

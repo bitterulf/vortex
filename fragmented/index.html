@@ -90,18 +90,74 @@
 			)
 		};
 
+		var Bus = function() {
+			this.listener = {};
+		};
+
+		Bus.prototype.listen = function(action, fn) {
+			if (!this.listener[action]) {
+				this.listener[action] = [];
+			}
+
+			this.listener[action].push(fn);
+		};
+
+		Bus.prototype.dispatch = function(action, data) {
+			if (this.listener[action]) {
+				this.listener[action].forEach(function(fn) {
+					fn(data);
+				});
+			}
+		};
+
+		var BackendBus = function() {
+			this.listener = {};
+		};
+
+		BackendBus.prototype.listen = function(action, fn) {
+			if (!this.listener[action]) {
+				this.listener[action] = [];
+			}
+
+			this.listener[action].push(fn);
+		};
+
+		BackendBus.prototype.dispatch = function(action, data) {
+			if (action == 'clicked') {
+				this.listener['info'].forEach(function(fn) {
+					fn({message: 'info from the server'});
+				});
+			}
+		};
+
+		var bus = new Bus();
+		var backendBus = new BackendBus();
+
 		var Fragment = {
 			oncreate: function(vnode) {
 				// we should use a interval here
 				window.setTimeout(function() {
-					m.render(vnode.dom, m(window[vnode.attrs.name]));
+					// var root = document.createElement('div');
+					// vnode.dom.appendChild(root);
+
+					m.mount(vnode.dom, {
+						view: function() {
+							return m(window[vnode.attrs.name], {
+								listen: bus.listen.bind(bus),
+								dispatch: function(action, data) {
+									data.origin = vnode.attrs.name;
+									bus.dispatch(action, data);
+								},
+								listenBackend: backendBus.listen.bind(backendBus),
+								dispatchBackend: backendBus.dispatch.bind(backendBus)
+							});
+						}
+					});
 				}, 100);
 			},
 			view: function(vnode) {
-				return m("div",
-			 		m('script',
-			  			{src: vnode.attrs.name+'.js'}
-					)
+				return m("div", {class: vnode.attrs.name},
+			 		m('script', {src: vnode.attrs.name+'.js'})
 				);
 			}
 		};

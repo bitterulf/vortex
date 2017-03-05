@@ -8,8 +8,8 @@ var fragmentA = {
 				vnode.state.active = !vnode.state.active;
 			}
 		});
-		vnode.attrs.listenBackend('info', function(data) {
-			console.log(data.message);
+		vnode.attrs.listenBackend(function(data) {
+			console.log('from backend', data);
 		});
 	},
 	view: function (vnode) {
@@ -24,7 +24,7 @@ var fragmentA = {
 						class: vnode.state.active ? 'btn-primary' : 'btn-default',
 						onclick: function() {
 							vnode.attrs.dispatch('clicked', {});
-							vnode.attrs.dispatchBackend('clicked', {});
+							vnode.attrs.dispatchBackend({action: 'clicked'});
 						}
 					}, [
 						m("span.glyphicon.glyphicon-search[aria-hidden='true']")

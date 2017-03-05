@@ -92,11 +92,6 @@
 			)
 		};
 
-		var primus = Primus.connect('http://localhost:8080');
-		const fragmentAstream = primus.substream('fragmentA');
-
-		fragmentAstream.on('data', console.log);
-
 		var Bus = function() {
 			this.listener = {};
 		};
@@ -117,28 +112,9 @@
 			}
 		};
 
-		var BackendBus = function() {
-			this.listener = {};
-		};
-
-		BackendBus.prototype.listen = function(action, fn) {
-			if (!this.listener[action]) {
-				this.listener[action] = [];
-			}
-
-			this.listener[action].push(fn);
-		};
-
-		BackendBus.prototype.dispatch = function(action, data) {
-			if (action == 'clicked') {
-				this.listener['info'].forEach(function(fn) {
-					fn({message: 'info from the server'});
-				});
-			}
-		};
-
 		var bus = new Bus();
-		var backendBus = new BackendBus();
+
+		var primus = Primus.connect('http://localhost:8080');
 
 		var Fragment = {
 			oncreate: function(vnode) {
@@ -146,6 +122,7 @@
 				window.setTimeout(function() {
 					// var root = document.createElement('div');
 					// vnode.dom.appendChild(root);
+					const stream = primus.substream(vnode.attrs.name);
 
 					m.mount(vnode.dom, {
 						view: function() {
@@ -155,8 +132,12 @@
 									data.origin = vnode.attrs.name;
 									bus.dispatch(action, data);
 								},
-								listenBackend: backendBus.listen.bind(backendBus),
-								dispatchBackend: backendBus.dispatch.bind(backendBus)
+								listenBackend: function(fn) {
+									stream.on('data', fn)
+								},
+								dispatchBackend: function(data) {
+									stream.write(data);
+								}
 							});
 						}
 					});

@@ -6,7 +6,9 @@ const substream = require('substream');
 const primus = Primus.createServer(function connection(spark) {
     const fragmentA = spark.substream('fragmentA');
 
-    fragmentA.on('data', console.log);
+    fragmentA.on('data', function(data) {
+		fragmentA.write(data);
+	});
 
     console.log('client connected');
 

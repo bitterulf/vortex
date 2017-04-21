@@ -7,13 +7,96 @@
 		<script src="lib/leaflet.js"></script>
 		<style>#mapid { height: 180px; }</style>
         <script>
+			const features = {
+			  "type": "FeatureCollection",
+			  "features": [
+				{
+				  "type": "Feature",
+				  "properties": {},
+				  "geometry": {
+					"type": "Polygon",
+					"coordinates": [
+					  [
+						[
+						  12.379995882511139,
+						  51.33816435486276
+						],
+						[
+						  12.37973302602768,
+						  51.337884522663266
+						],
+						[
+						  12.379783987998962,
+						  51.33786441489452
+						],
+						[
+						  12.379762530326841,
+						  51.33784095581986
+						],
+						[
+						  12.379636466503142,
+						  51.337829226278
+						],
+						[
+						  12.379714250564575,
+						  51.33746560899227
+						],
+						[
+						  12.380140721797943,
+						  51.33739690678484
+						],
+						[
+						  12.380189001560211,
+						  51.33745723067981
+						],
+						[
+						  12.38066643476486,
+						  51.337395231119935
+						],
+						[
+						  12.381119728088379,
+						  51.337882847016196
+						],
+						[
+						  12.38109290599823,
+						  51.33802360115558
+						],
+						[
+						  12.380996346473694,
+						  51.33804035757195
+						],
+						[
+						  12.38098829984665,
+						  51.338109058815064
+						],
+						[
+						  12.380309700965881,
+						  51.33819619195086
+						],
+						[
+						  12.380266785621643,
+						  51.338135869028314
+						],
+						[
+						  12.379995882511139,
+						  51.33816435486276
+						]
+					  ]
+					]
+				  }
+				}
+			  ]
+			}
+
 			xtag.register('x-map', {
 				lifecycle: {
 					created: function() {
 						const markerList = xtag.queryChildren(this, 'x-marker');
 
 						this.innerHTML += '<style>.leaflet-container { height: 512px; width: 512px;} </style><div></div>';
-						var mymap = L.map(this.lastChild).setView([this.attributes.lat.value, this.attributes.lng.value], 13);
+						var mymap = L.map(this.lastChild).setView([this.attributes.lat.value, this.attributes.lng.value], 18);
+
+						L.geoJSON(features).addTo(mymap);
 
 						markerList.forEach(function(child) {
 							const marker = L.marker([child.attributes.lat.value, child.attributes.lng.value])
@@ -34,11 +117,8 @@
         </script>
     </head>
     <body>
-		<x-map lat="51.505" lng="-0.09">
-			<x-marker lat="51.51" lng="-0.09">
-				building
-			</x-marker>
-			<x-marker lat="51.5" lng="-0.09">
+		<x-map lng="12.3800" lat="51.3380">
+			<x-marker lng="12.3800" lat="51.3380">
 				building
 			</x-marker>
 		</x-map>

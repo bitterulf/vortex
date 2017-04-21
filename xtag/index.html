@@ -1,9 +1,21 @@
 <html>
     <head>
         <title>xtag</title>
-        <script src="x-tag-core.min.js"></script>
+        <script src="lib/x-tag-core.min.js"></script>
 		<script src="components.js"></script>
+		<link rel="stylesheet" href="lib/leaflet.css" />
+		<script src="lib/leaflet.js"></script>
+		<style>#mapid { height: 180px; }</style>
         <script>
+			xtag.register('x-map', {
+				lifecycle: {
+					created: function() {
+						this.innerHTML = '<style>.leaflet-container { height: 512px; width: 512px;} </style><div></div>';
+						var mymap = L.map(this.lastChild).setView([51.505, -0.09], 13);
+						var marker = L.marker([51.5, -0.09]).addTo(mymap);
+					}
+				}
+			});
         </script>
     </head>
     <body>
@@ -14,5 +26,7 @@
                 </x-button>
             </x-item>
         </x-frame>
+		<x-map>
+		</x-map>
     </body>
 </html>

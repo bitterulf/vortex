@@ -93,8 +93,33 @@
 					created: function() {
 						const markerList = xtag.queryChildren(this, 'x-marker');
 
-						this.innerHTML += '<style>.leaflet-container { height: 512px; width: 512px;} </style><div></div>';
-						var mymap = L.map(this.lastChild).setView([this.attributes.lat.value, this.attributes.lng.value], 18);
+						this.innerHTML = '<style>.leaflet-container { height: 512px; width: 512px;} </style><div></div>';
+
+						var buildingLayer = L.layerGroup();
+
+						var mymap = L.map(this.lastChild, {
+							center: [this.attributes.lat.value, this.attributes.lng.value],
+							zoom: 18,
+							layers: [buildingLayer]
+						});
+
+						mymap.on('zoomend', function() {
+							const currentZoom = mymap.getZoom();
+							buildingLayer.getLayers().forEach(function(building) {
+								let targetIcon;
+
+								building.options.icons.forEach(function(icon) {
+									if (!targetIcon || Math.abs(targetIcon.zoom - currentZoom) > Math.abs(icon.zoom - currentZoom))  {
+										targetIcon = icon;
+									}
+								});
+
+								building.setIcon(new L.Icon({
+									iconUrl: targetIcon.iconUrl,
+									iconSize: targetIcon.iconSize
+								}));
+							});
+						});
 
 						L.geoJSON(features).addTo(mymap);
 
@@ -113,9 +138,26 @@
 
 							const marker = L.marker([child.attributes.lat.value, child.attributes.lng.value], {
 								icon: Icon,
-								draggable: true
+								draggable: true,
+								icons: [
+									{
+										zoom: 18,
+										iconUrl: 'lib/images/castle.png',
+										iconSize: [128, 128]
+									},
+									{
+										zoom: 17,
+										iconUrl: 'lib/images/castle_icon.png',
+										iconSize: [64, 64]
+									},
+									{
+										zoom: 16,
+										iconUrl: 'lib/images/castle_icon_small.png',
+										iconSize: [32, 32]
+									}
+								]
 							})
-								.addTo(mymap)
+								.addTo(buildingLayer)
 							    .bindPopup(child.innerHTML);
 
 							marker.on('moveend', function(event) {

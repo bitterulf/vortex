@@ -91,6 +91,26 @@
 			xtag.register('x-map', {
 				lifecycle: {
 					created: function() {
+						L.Control.Sample = L.Control.extend({
+						  options: {
+							// topright, topleft, bottomleft, bottomright
+							position: 'topright'
+						  },
+						  initialize: function (options) {
+						  },
+						  onAdd: function (map) {
+						  	const container = L.DomUtil.create('div', 'sample-container');
+							container.innerHTML = '<x-button>do something</x-button>';
+							return container;
+						  },
+						  onRemove: function (map) {
+						  }
+						});
+
+						L.control.sample = function(id, options) {
+						  return new L.Control.Sample(id, options);
+						}
+
 						const markerList = xtag.queryChildren(this, 'x-marker');
 
 						this.innerHTML = '<style>.leaflet-container { height: 512px; width: 512px;} </style><div></div>';
@@ -102,6 +122,9 @@
 							zoom: 18,
 							layers: [buildingLayer]
 						});
+
+						const control = new L.control.sample();
+						control.addTo(mymap);
 
 						mymap.on('zoomend', function() {
 							const currentZoom = mymap.getZoom();

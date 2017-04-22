@@ -99,9 +99,29 @@
 						L.geoJSON(features).addTo(mymap);
 
 						markerList.forEach(function(child) {
-							const marker = L.marker([child.attributes.lat.value, child.attributes.lng.value])
+							const Icon = new L.Icon({
+								iconUrl: 'lib/images/castle.png',
+								iconSize:     [128, 128]
+							})
+
+							const circle = L.circle([child.attributes.lat.value, child.attributes.lng.value], {
+								color: 'green',
+								fillColor: 'green',
+								fillOpacity: 0.1,
+								radius: 32
+							}).addTo(mymap);
+
+							const marker = L.marker([child.attributes.lat.value, child.attributes.lng.value], {
+								icon: Icon,
+								draggable: true
+							})
 								.addTo(mymap)
 							    .bindPopup(child.innerHTML);
+
+							marker.on('moveend', function(event) {
+								circle.setLatLng(event.target.getLatLng());
+							});
+
 						});
 					}
 				}

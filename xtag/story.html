@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <title>xtag</title>
+        <script src="lib/x-tag-core.min.js"></script>
+        <script>
+			const Story = function(element, scenes, startScene) {
+				this.element = element;
+				this.scenes = scenes,
+				this.currentScene = startScene;
+				this.plotIndex = 0;
+			};
+
+			Story.prototype.render = function() {
+				const currentScene = this.currentScene;
+				const scene = this.scenes.find(function(s) {
+					return s.attributes.id.value == currentScene;
+				});
+
+				const step = scene.children[this.plotIndex];
+
+				this.element.innerHTML = step.outerHTML;
+			};
+
+			Story.prototype.next = function() {
+				const currentScene = this.currentScene;
+				const scene = this.scenes.find(function(s) {
+					return s.attributes.id.value == currentScene;
+				});
+
+				if (scene.children.length >= this.plotIndex + 1) {
+					this.plotIndex++;
+					this.render();
+				}
+				else {
+					console.log('last step');
+				}
+			};
+
+			Story.prototype.jumpToScene = function(id) {
+				this.plotIndex = 0;
+				this.currentScene = id;
+				this.render();
+			};
+
+			let story;
+
+			xtag.register('story-container', {
+				lifecycle: {
+					created: function() {
+						const startScene = this.attributes.start.value;
+						const scenes = xtag.queryChildren(this, 'story-scene');
+						this.innerHTML = '<div>here is the story rendered</div>';
+						story = new Story(this.lastChild, scenes, startScene);
+
+						story.render();
+					}
+				}
+			});
+
+			xtag.register('display-text', {
+				lifecycle: {
+					created: function() {
+						xtag.addEvent(this, 'click', function(event){
+							story.next();
+						});
+					}
+				}
+			});
+
+			xtag.register('scene-jump', {
+				lifecycle: {
+					created: function() {
+						const scene = this.attributes.target.value;
+						xtag.addEvent(this, 'click', function(event){
+							story.jumpToScene(scene);
+						});
+					}
+				}
+			});
+        </script>
+    </head>
+    <body>
+		<story-container start="scene1">
+			<story-scene id="scene1">
+				<display-text>this is scene1</display-text>
+				<display-text>you see a road</display-text>
+				<prompt-choices>
+					<scene-jump target="scene1">choose scene1</scene-jump>
+					<scene-jump target="scene2">choose scene2</scene-jump>
+				</prompt-choices>
+				<scene-jump target="scene2">scene2</scene-jump>
+			</story-scene>
+			<story-scene id="scene2">
+				<display-text>this is scene2</display-text>
+				<scene-jump target="scene1">scene1</scene-jump>
+			</story-scene>
+		</story-container>
+    </body>
+</html>
